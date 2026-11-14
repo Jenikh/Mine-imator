@@ -17,8 +17,8 @@ This directory contains the independent C++ rewrite of Mine-imator's GameMaker i
 | Metric | Count |
 |---|---:|
 | GML files in source repository | 2,067 |
-| Native C++ files created in this rewrite | 10 |
-| Remaining GML files | 2,057 |
+| Native C++ files created in this rewrite | 17 |
+| Remaining GML files | 2,050 |
 
 ## Translated files
 
@@ -32,8 +32,15 @@ This directory contains the independent C++ rewrite of Mine-imator's GameMaker i
 8. `GmProject/scripts/action_background_fog_size/action_background_fog_size.gml` → matching `.cpp`
 9. `GmProject/scripts/action_background_fog_sky/action_background_fog_sky.gml` → matching `.cpp`
 10. `GmProject/scripts/action_background_fog_object_color/action_background_fog_object_color.gml` → matching `.cpp`
+11. `GmProject/scripts/action_background_fog_custom_object_color/action_background_fog_custom_object_color.gml` → matching `.cpp`
+12. `GmProject/scripts/action_background_foliage_color/action_background_foliage_color.gml` → matching `.cpp`
+13. `GmProject/scripts/action_background_grass_color/action_background_grass_color.gml` → matching `.cpp`
+14. `GmProject/scripts/action_background_ground_show/action_background_ground_show.gml` → matching `.cpp`
+15. `GmProject/scripts/action_background_ground_slot/action_background_ground_slot.gml` → matching `.cpp`
+16. `GmProject/scripts/action_background_image_box_mapped/action_background_image_box_mapped.gml` → matching `.cpp`
+17. `GmProject/scripts/action_background_image_rotation/action_background_image_rotation.gml` → matching `.cpp`
 
-The nine background actions use `NativeCpp/Common/BackgroundActionContext.hpp` for timeline edits, undo/redo suppression, history recording, and background state. The application must provide the adapter callbacks and register these translation units in its build.
+The sixteen background actions use `NativeCpp/Common/BackgroundActionContext.hpp` for timeline edits, undo/redo suppression, history recording, and background state. The application must provide the adapter callbacks and register these translation units in its build.
 
 ## Important
 
