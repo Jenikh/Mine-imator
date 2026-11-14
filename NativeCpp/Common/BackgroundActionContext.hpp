@@ -17,7 +17,7 @@ namespace MineImator::Native
 
         std::function<bool()> selectBackground;
         std::function<void(const QString&, bool)> timelineBegin;
-        std::function<void(const QString&, const QVariant&, bool)> timelineSet;
+        std::function<void(const QString&, const QVariant&, double)> timelineSet;
         std::function<void()> timelineDone;
         std::function<void(const QString&, const QVariant&, const QVariant&, bool)> recordHistory;
     };
@@ -26,7 +26,7 @@ namespace MineImator::Native
                                   const QString& action,
                                   const QString& timelineValue,
                                   const QVariant& value,
-                                  bool add)
+                                  double add)
     {
         if (!context.selectBackground || !context.selectBackground())
             return false;
