@@ -17,30 +17,68 @@ This directory contains the independent C++ rewrite of Mine-imator's GameMaker i
 | Metric | Count |
 |---|---:|
 | GML files in source repository | 2,067 |
-| Native C++ files created in this rewrite | 17 |
-| Remaining GML files | 2,050 |
+| Native C++ files created in this rewrite | 65 |
+| Remaining GML files | 2,002 |
+
+### By subsystem
+
+| Subsystem | GML files | Ported |
+|---|---:|---:|
+| `scripts/action_background_*` | 64 | 64 |
+| `scripts/access_error` | 1 | 1 |
+| Everything else | 2,002 | 0 |
 
 ## Translated files
 
-1. `GmProject/scripts/access_error/access_error.gml` → `NativeCpp/GmProject/scripts/access_error/access_error.cpp`
-2. `GmProject/scripts/action_background_ambient_color/action_background_ambient_color.gml` → matching `.cpp`
-3. `GmProject/scripts/action_background_fog_color/action_background_fog_color.gml` → matching `.cpp`
-4. `GmProject/scripts/action_background_fog_color_custom/action_background_fog_color_custom.gml` → matching `.cpp`
-5. `GmProject/scripts/action_background_fog_distance/action_background_fog_distance.gml` → matching `.cpp`
-6. `GmProject/scripts/action_background_fog_height/action_background_fog_height.gml` → matching `.cpp`
-7. `GmProject/scripts/action_background_fog_show/action_background_fog_show.gml` → matching `.cpp`
-8. `GmProject/scripts/action_background_fog_size/action_background_fog_size.gml` → matching `.cpp`
-9. `GmProject/scripts/action_background_fog_sky/action_background_fog_sky.gml` → matching `.cpp`
-10. `GmProject/scripts/action_background_fog_object_color/action_background_fog_object_color.gml` → matching `.cpp`
-11. `GmProject/scripts/action_background_fog_custom_object_color/action_background_fog_custom_object_color.gml` → matching `.cpp`
-12. `GmProject/scripts/action_background_foliage_color/action_background_foliage_color.gml` → matching `.cpp`
-13. `GmProject/scripts/action_background_grass_color/action_background_grass_color.gml` → matching `.cpp`
-14. `GmProject/scripts/action_background_ground_show/action_background_ground_show.gml` → matching `.cpp`
-15. `GmProject/scripts/action_background_ground_slot/action_background_ground_slot.gml` → matching `.cpp`
-16. `GmProject/scripts/action_background_image_box_mapped/action_background_image_box_mapped.gml` → matching `.cpp`
-17. `GmProject/scripts/action_background_image_rotation/action_background_image_rotation.gml` → matching `.cpp`
+`NativeCpp/Common/BackgroundActionContext.hpp` is the shared adapter boundary for
+every background action. It owns value/timeline semantics, resource selection
+and reference counting, biome resolution and history recording; nothing in this
+directory depends on the GameMaker runtime.
 
-The sixteen background actions use `NativeCpp/Common/BackgroundActionContext.hpp` for timeline edits, undo/redo suppression, history recording, and background state. The application must provide the adapter callbacks and register these translation units in its build.
+- `GmProject/scripts/access_error/access_error.gml` → `NativeCpp/GmProject/scripts/access_error/access_error.cpp`
+
+The following background actions are ported, each `action_background_<name>.gml`
+to the matching `.cpp`:
+
+- atmosphere: `ambient_color`, `fog_color`, `fog_color_custom`,
+  `fog_custom_object_color`, `fog_distance`, `fog_height`, `fog_object_color`,
+  `fog_show`, `fog_size`, `fog_sky`, `foliage_color`, `grass_color`, `night_color`,
+  `sunlight_angle`, `sunlight_color`, `sunlight_strength`, `texture_animation_speed`,
+  `twilight`, `water_color`
+- ground: `ground_show`, `ground_slot`, `ground_tex`, `ground_tex_material`,
+  `ground_tex_normal`, `biome`
+- image: `image`, `image_box_mapped`, `image_rotation`, `image_show`,
+  `image_save_map`, `image_stretch`, `image_type`
+- sky: `sky_color`, `sky_rotation`, `sky_time`, `sky_clouds_color`,
+  `sky_clouds_height`, `sky_clouds_mode`, `sky_clouds_offset`, `sky_clouds_show`,
+  `sky_clouds_size`, `sky_clouds_speed`, `sky_clouds_tex`, `sky_clouds_thickness`,
+  `sky_moon_angle`, `sky_moon_phase`, `sky_moon_scale`, `sky_moon_tex`,
+  `sky_sun_angle`, `sky_sun_scale`, `sky_sun_tex`
+- leaves: `leaves_acacia_color`, `leaves_birch_color`, `leaves_dark_oak_color`,
+  `leaves_jungle_color`, `leaves_mangrove_color`, `leaves_oak_color`,
+  `leaves_spruce_color`
+- wind: `wind`, `wind_direction`, `wind_directional_speed`,
+  `wind_directional_strength`, `wind_speed`, `wind_strength`
+
+### Adapter contract
+
+`BackgroundActionContext` is supplied by the application. The background actions
+rely on these callbacks:
+
+- timeline/history: `selectBackground`, `timelineBegin`, `timelineSet`,
+  `timelineDone`, `recordHistory`
+- refresh: `refreshResourceColors`, `markLibraryPreviewDirty`,
+  `updateGroundTextures`, `updateGroundTexturesMaterial`,
+  `updateGroundTexturesNormal`, `updateClouds`
+- resources (`action_background_*_tex`, `_image`, `ground_tex*`): `undoResource`,
+  `redoResource`, `browseResourceFile`, `libraryFileExists`, `createResource`,
+  `recordResourceHistory`, `releaseResource`, `retainResource`
+- biomes (`action_background_biome`): `resolveBiomeName`
+- map export (`action_background_image_save_map`): `saveImageDialog`,
+  `saveMapCubeImage`
+
+Resource actions take a `BackgroundResourceRequest` (`none`, `existing`,
+`browse`) instead of GameMaker's loose instance/`e_option.BROWSE` argument.
 
 ## Important
 
