@@ -19,6 +19,9 @@ namespace MineImator::Native
         std::function<void(const QString&, bool)> timelineBegin;
         std::function<void(const QString&, const QVariant&, double)> timelineSet;
         std::function<void()> timelineDone;
+        std::function<void()> refreshResourceColors;
+        std::function<void()> markLibraryPreviewDirty;
+        std::function<void()> updateGroundTextures;
         std::function<void(const QString&, const QVariant&, const QVariant&, bool)> recordHistory;
     };
 
