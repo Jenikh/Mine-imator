@@ -44,12 +44,11 @@ namespace MineImator::Native
                                        const QString& action,
                                        const QString& key,
                                        const QVariant& value,
-                                       bool historyEnabled)
+                                       bool historyFlag)
     {
         const QVariant previous = context.values.value(key);
-        if (!context.historyUndo && !context.historyRedo && historyEnabled &&
-            context.recordHistory)
-            context.recordHistory(action, previous, value, true);
+        if (!context.historyUndo && !context.historyRedo && context.recordHistory)
+            context.recordHistory(action, previous, value, historyFlag);
         context.values.insert(key, value);
     }
 
