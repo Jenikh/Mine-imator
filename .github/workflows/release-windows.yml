@@ -1,0 +1,94 @@
+name: Windows release
+
+# Builds the Windows x64 release the same way BUILD.md does:
+#   Setup.ps1 Qt      -> static Qt 5.15.19 + extracted third-party sources
+#   Setup.ps1 Release -> CMake Release build and install/ layout
+# The Qt build is cached; only the first run pays for compiling Qt.
+#
+# Push a tag (v2.0.0, ...) to publish a GitHub release, or run the workflow
+# manually to get the packaged build as a workflow artifact.
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+concurrency:
+  group: windows-release-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+env:
+  DEV_DIR: D:\Dev
+
+jobs:
+  windows-x64:
+    name: Windows x64
+    runs-on: windows-2022
+    timeout-minutes: 350
+
+    steps:
+      - name: Check out sources
+        uses: actions/checkout@v4
+
+      - name: Prepare third-party directory
+        shell: pwsh
+        run: New-Item -ItemType Directory -Force -Path $env:DEV_DIR | Out-Null
+
+      # Setup.ps1 asks before reusing an existing Qt directory, so cache only
+      # the install tree that CMake consumes and start Qt from scratch on a miss.
+      - name: Restore static Qt 5.15.19
+        id: qt
+        uses: actions/cache@v4
+        with:
+          path: D:\Dev\Qt\5.15.19\install
+          key: qt-5.15.19-win-x64-${{ hashFiles('Setup.ps1', 'CppProject/External/Win64/libssl.lib', 'CppProject/External/Win64/libcrypto.lib') }}
+
+      - name: Build static Qt
+        if: steps.qt.outputs.cache-hit != 'true'
+        shell: pwsh
+        run: |
+          Remove-Item -Recurse -Force (Join-Path $env:DEV_DIR "Qt\5.15.19") -ErrorAction SilentlyContinue
+          .\Setup.ps1 Qt
+
+      - name: Rebuild CppGen from source
+        shell: pwsh
+        run: |
+          cmake -S CppGen -B CppGen/build -A x64
+          cmake --build CppGen/build --config Release --parallel
+          Copy-Item CppGen/build/CppGen.exe CppGen/Win64/CppGen.exe -Force
+
+      - name: Build release
+        shell: pwsh
+        run: .\Setup.ps1 Release
+
+      - name: Package install folder
+        id: package
+        shell: pwsh
+        run: |
+          $name = if ("${{ github.ref_type }}" -eq "tag") { "${{ github.ref_name }}" } else { "dev-${{ github.run_number }}" }
+          $archive = "Mine-imator-windows-x64-$name.zip"
+          if (-not (Test-Path "install\Mine-imator\Mine-imator.exe")) {
+            throw "The release build did not produce install\Mine-imator\Mine-imator.exe"
+          }
+          tar.exe -a -c -f $archive -C install Mine-imator
+          $size = [math]::Round((Get-Item $archive).Length / 1MB, 1)
+          Write-Host "Created $archive ($size MB)"
+          "archive=$archive" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Mine-imator-windows-x64
+          path: ${{ steps.package.outputs.archive }}
+          if-no-files-found: error
+
+      - name: Publish GitHub release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ steps.package.outputs.archive }}
+          generate_release_notes: true

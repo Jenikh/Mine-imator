@@ -175,6 +175,16 @@ To change the third-party source code location, set the `DEV_DIR` environment va
 5. Generate Release build in `install/`
     * Run `./Setup.sh Release x86_64`
 
+## Automated release builds (Windows)
+`.github/workflows/release-windows.yml` builds the Windows x64 release on GitHub Actions.
+
+1. It runs `.\Setup.ps1 Qt` to build static Qt 5.15.19 and extract the third-party sources. The Qt install tree is cached, so only the first run compiles Qt.
+2. It rebuilds `CppGen` from source into `CppGen\Win64\CppGen.exe` so the generator always matches `CppGen\Sources`.
+3. It runs `.\Setup.ps1 Release` and packs `install\Mine-imator` into `Mine-imator-windows-x64-<version>.zip`.
+4. Every run uploads the archive as the `Mine-imator-windows-x64` workflow artifact. Pushing a `v*` tag also publishes it as a GitHub release.
+
+Run it from the Actions tab, or with `gh workflow run "Windows release"`.
+
 ## Guide coverage
 This guide has been tested on the following systems. If you run into troubles or errors, please [open a Github issue](https://github.com/stuffbydavid/Mine-imator/issues) with details.
 * Windows 11 25H2 64-bit
