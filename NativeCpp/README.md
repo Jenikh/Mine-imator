@@ -17,14 +17,23 @@ This directory contains the independent C++ rewrite of Mine-imator's GameMaker i
 | Metric | Count |
 |---|---:|
 | GML files in source repository | 2,067 |
-| Native C++ files created in this rewrite | 1 |
-| Remaining GML files | 2,066 |
+| Native C++ files created in this rewrite | 10 |
+| Remaining GML files | 2,057 |
 
-## First translated file
+## Translated files
 
-- Source: `GmProject/scripts/access_error/access_error.gml`
-- Native: `NativeCpp/GmProject/scripts/access_error/access_error.cpp`
-- Translation: `show_message(...) ` becomes a native Qt `QMessageBox::critical(...)` call.
+1. `GmProject/scripts/access_error/access_error.gml` → `NativeCpp/GmProject/scripts/access_error/access_error.cpp`
+2. `GmProject/scripts/action_background_ambient_color/action_background_ambient_color.gml` → matching `.cpp`
+3. `GmProject/scripts/action_background_fog_color/action_background_fog_color.gml` → matching `.cpp`
+4. `GmProject/scripts/action_background_fog_color_custom/action_background_fog_color_custom.gml` → matching `.cpp`
+5. `GmProject/scripts/action_background_fog_distance/action_background_fog_distance.gml` → matching `.cpp`
+6. `GmProject/scripts/action_background_fog_height/action_background_fog_height.gml` → matching `.cpp`
+7. `GmProject/scripts/action_background_fog_show/action_background_fog_show.gml` → matching `.cpp`
+8. `GmProject/scripts/action_background_fog_size/action_background_fog_size.gml` → matching `.cpp`
+9. `GmProject/scripts/action_background_fog_sky/action_background_fog_sky.gml` → matching `.cpp`
+10. `GmProject/scripts/action_background_fog_object_color/action_background_fog_object_color.gml` → matching `.cpp`
+
+The nine background actions use `NativeCpp/Common/BackgroundActionContext.hpp` for timeline edits, undo/redo suppression, history recording, and background state. The application must provide the adapter callbacks and register these translation units in its build.
 
 ## Important
 
