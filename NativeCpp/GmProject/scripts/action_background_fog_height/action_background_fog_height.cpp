@@ -1,4 +1,4 @@
-#include "../../../../../Common/BackgroundActionContext.hpp"
+#include "../../../Common/BackgroundActionContext.hpp"
 
 namespace MineImator::Native
 {
@@ -6,7 +6,7 @@ void action_background_fog_height(BackgroundActionContext& context, double value
 {
     if (!context.historyUndo && !context.historyRedo &&
         beginTimelineEdit(context, "action_background_fog_height",
-                          "BG_FOG_HEIGHT", value, add != 1.0))
+                          "BG_FOG_HEIGHT", value, add))
         return;
     assignBackgroundNumericValue(context, "action_background_fog_height",
                                  "background_fog_height", value, add);
